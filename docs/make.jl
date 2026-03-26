@@ -64,11 +64,24 @@ end
 
 makedocs(;
     modules = [ARSampling],
-    authors = "Elias Sjölin <elias.sjolin@gmail.com>",
-    repo = "https://github.com/Eliassj/ARSampling.jl/blob/{commit}{path}#{line}",
+    authors = "Elias Sjölin <elias.sjolin@gmail.com> and contributors",
     sitename = "ARSampling.jl",
-    format = Documenter.HTML(; canonical = "https://Eliassj.github.io/ARSampling.jl"),
-    pages = list_pages(),
+    format = Documenter.HTML(;
+        canonical = "https://Eliassj.github.io/ARSampling.jl",
+        edit_link = "master",
+        assets = ["assets/favicon.ico"],
+    ),
+    pages = [
+        "Home" => "index.md",
+        "Benchmarks" => "benchmarks.md",
+        "Public API" => "api.md",
+        "Internals" => "devdocs.md",
+        "References" => "references.md",
+    ],
+    plugins = [bib],
+    remotes = nothing,
+    checkdocs = :public,
+    warnonly = [:missing_docs],
 )
 
 deploydocs(; repo = "github.com/Eliassj/ARSampling.jl")
