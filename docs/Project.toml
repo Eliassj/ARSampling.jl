@@ -17,3 +17,4 @@ ARSampling = {path = ".."}
 
 [compat]
 Documenter = "1"
+DocumenterCitations = "1.4.1"
