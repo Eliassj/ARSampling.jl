@@ -96,13 +96,11 @@ ARS.Objective(somefun)
 ```
 """
 function Objective(f::Function, init = one(Float64); adbackend = AutoForwardDiff())
-    obj = let f = f, backend = adbackend
-        gradprep = prepare_gradient(f, backend, init)
-        Objective(
-            f,
-            x -> gradient(f, gradprep, backend, x)
-        )
-    end
+    gradprep = prepare_gradient(f, adbackend, init)
+    obj = Objective(
+        f,
+        x -> gradient(f, gradprep, adbackend, x)
+    )
     return obj
 end
 
@@ -321,22 +319,78 @@ struct ARSampler{T, F, G}
 end
 
 """
-$(TYPEDSIGNATURES)
+    ARSampler(
+        obj::Objective{F, G},
+        domain::Tuple{T, T},
+        initial_points::Vector{T}
+    ) where {T <: AbstractFloat, F <: Function, G <: Function}
 
-Initialize an adaptive rejection sampler over a (log) objective function from `obj`. `initial_points` should be a vector of abscissae defining the initial segments of the sampler. At least 2 of the points should be on opposite sides of the objective function's maximum.
+    ARSampler(
+        obj::Objective{F, G},
+        domain::Tuple{T, T},
+        search_range::Tuple{T, T} = (-10.0, 10.0),
+        search_step = 0.1
+    ) where {T <: AbstractFloat, F <: Function, G <: Function}
+
+Initialize an adaptive rejection sampler over an objective function from `obj` ([`ARSampling.Objective`](@ref)).
+`initial_points` should be a vector defining the abscissae of the initial segments of the sampler.
+ At least 2 of the points should be on opposite sides of the objective function's maximum.
+
+If no `initial_points` an attempt to find suitable ones will be made by searching for
+the first negative/positive slope of `obj`. The default search range is `-10:10` with a
+step of `0.1`.
+
+!!! warning
+    As it currently stands, finding inital points will fail for distributions bounded
+    to the left/right of their maximum. In these cases the initial point(s) need to
+    be provided manually (however, only a single initial point has to be provided).
 
 $(METHODLIST)
 """
+function ARSampler end
+
 function ARSampler(
         obj::Objective{F, G},
-        initial_points::Vector{T},
-        domain::Tuple{T, T}
+        domain::Tuple{T, T},
+        initial_points::Vector{T}
     ) where {T <: AbstractFloat, F <: Function, G <: Function}
 
     u = UpperHull(obj, initial_points, domain)
     l = LowerHull(u, obj)
 
     return ARSampler{T, F, G}(obj, u, l)
+end
+
+
+function ARSampler(obj::Objective{F, G}, domain::Tuple{T, T}, search_range::Tuple{T, T} = (-10.0, 10.0); search_step = 0.5) where {T <: AbstractFloat, F <: Function, G <: Function}
+    lbs = max(domain[1], search_range[1])
+    ubs = min(domain[2], search_range[2])
+    initial_points = find_initial_points(obj, lbs, ubs, search_step)
+
+    return ARSampler(obj, domain, initial_points)
+end
+
+function find_initial_points(obj, lbs, ubs, search_step)
+    grad = obj.grad
+    r = lbs:search_step:ubs
+    g = (grad(x) for x in r)
+    l = findfirst(>(0), g)
+    u = findfirst(<(0), g)
+    isnothing(l) && throw(ErrorException(
+        lazy"""
+        Could not find left initial segment.
+        Search range: $(lbs) -- $(ubs)
+        Search step: $(search_step)
+        """
+    ))
+    isnothing(u) && throw(ErrorException(
+        lazy"""
+        Could not find right initial segment.
+        Search range: $(lbs) -- $(ubs)
+        Search step: $(search_step)
+        """
+    ))
+    return [r[l], r[u]]
 end
 
 function n_segments(s::ARSampler)
@@ -444,7 +498,9 @@ __sample!(s::ARSampler{T}, n::Integer, add_segments::Bool, max_segments) where {
     sample!([rng=default_rng()], s::ARSampler, n::Integer, add_segments::Bool=true)
     sample!([rng=default_rng()], v::AbstractVector, s::ARSampler, add_segments::Bool=true)
 
-Draw samples from `s`. If supplied, a vector `v` will be filled with samples. Otherwise the number of samples is specified with `n`.
+Draw samples from `s`. If supplied, a vector `v` will be filled with samples.
+Otherwise the number of samples is specified with `n`.
+
 """
 function sample! end
 

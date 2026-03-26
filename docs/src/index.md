@@ -54,7 +54,7 @@ obj = Objective(f_log)
 We then define the sampler itself providing the initial points for the hull as well as the desired domain. Initial points needs to be at opposing sides of the function maximum.
 
 ```@example 1
-sam = ARSampler(obj, [-2., 4.], (-Inf, Inf))
+sam = ARSampler(obj, (-Inf, Inf), [-2., 4.])
 ```
 
 In order to retrieve samples, we use the [`ARSampling.sample!`](@ref) function. As is indicated by the `!`, this function modifies the sampler itself in order to improve future sampling whenever a sample is rejected.
@@ -135,7 +135,7 @@ Lets define the objective and sampler. As the beta distribution is bounded on $x
 f_log(x) = log(f(x))
 obj = Objective(f_log)
 
-sam = ARSampler(obj, [0.2, 0.8], (0.0, 1.0))
+sam = ARSampler(obj, (0.0, 1.0), [0.2, 0.8])
 nothing # hide
 ```
 
@@ -151,7 +151,7 @@ axislegend(ax)
 fig # hide
 ```
 
-Of course, we can specify arbitrary bounds. Let's define the same beta distribution as above but truncated at $[0.5, 1.0]$ and compare them with sampling from a truncated `Distributions.jl` distribution (with plotting code hidden for brevity).
+Of course, we can specify arbitrary bounds. Let's define the same beta distribution as above but truncated at $[0.5, 1.0]$ and compare them with sampling from a truncated `Distributions.jl` distribution (with plotting code hidden for brevity). Since the distribution is bounded to the right of its maximum we only need to specify one initial segment.
 
 ```@setup 2
 cols = Makie.wong_colors()
@@ -160,7 +160,7 @@ elem_dist = LineElement(color = cols[2], linestyle = :dot)
 ```
 
 ```@example 2
-sam_bounded = ARSampler(obj, [0.8], (0.5, 1.0))
+sam_bounded = ARSampler(obj, (0.5, 1.0), [0.8])
 
 samples_bounded = sample!(sam_bounded, 100000)
 
@@ -240,7 +240,7 @@ end
 
 obj = Objective(x -> log_alpha(x, 3, 15))
 
-sam = ARSampler(obj, [-0.2, 0.2], (-Inf, Inf))
+sam = ARSampler(obj, (-Inf, Inf), [-0.2, 0.2])
 samples = sample!(sam, 10000)
 
 xticks = -3:3 # hide
@@ -254,7 +254,7 @@ lines!(ax2, -3..3, x -> exp(log_alpha(x, 3, 15)), color = :orange, alpha = 0.8) 
 fig # hide
 ```
 
-However, for high numbers of clusters/data points we run into problems.
+However, for high numbers of clusters/data points we run into issues.
 
 ```@example 3
 x = log_alpha(0.3, 9, 400)
@@ -275,7 +275,7 @@ In order to sample using `BigFloat` we pass the type to the sampler constructors
 ```@example 3
 obj = Objective(x -> log_alpha(x, 9, 400), one(BigFloat))
 
-sam = ARSampler(obj, big.([-0.2, 0.5]), big.((-Inf, Inf)))
+sam = ARSampler(obj, big.((-Inf, Inf)), big.([-0.2, 0.5]))
 samples = sample!(sam, 10000)
 nothing # hide
 ```

@@ -17,7 +17,7 @@ nothing # hide
 ### ForwardDiff.jl
 
 ```@example bench1
-const sam_forwarddiff = ARSampler(Objective(f), [-0.5, 0.5], (-Inf, Inf))
+const sam_forwarddiff = ARSampler(Objective(f), (-Inf, Inf), [-0.5, 0.5])
 
 @be deepcopy(sam_forwarddiff) sample!(_, 100000, true, 25) samples=100 evals=1 seconds=1000
 ```
@@ -25,7 +25,7 @@ const sam_forwarddiff = ARSampler(Objective(f), [-0.5, 0.5], (-Inf, Inf))
 ### Mooncake.jl
 
 ```@example bench1
-sam_mooncake = ARSampler(Objective(f; adbackend = AutoMooncake()), [-0.5, 0.5], (-Inf, Inf))
+sam_mooncake = ARSampler(Objective(f; adbackend = AutoMooncake()), (-Inf, Inf), [-0.5, 0.5])
 
 @be deepcopy(sam_mooncake) sample!(_, 100000, true, 25) samples=100 evals=1 seconds=1000
 ```
@@ -33,7 +33,7 @@ sam_mooncake = ARSampler(Objective(f; adbackend = AutoMooncake()), [-0.5, 0.5], 
 ### Enzyme
 
 ```@example bench1
-sam_mooncake = ARSampler(Objective(f; adbackend = AutoEnzyme()), [-0.5, 0.5], (-Inf, Inf))
+sam_mooncake = ARSampler(Objective(f; adbackend = AutoEnzyme()), (-Inf, Inf), [-0.5, 0.5])
 
 @be deepcopy(sam_mooncake) sample!(_, 100000, true, 25) samples=100 evals=1 seconds=1000
 ```
