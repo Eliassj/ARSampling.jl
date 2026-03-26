@@ -16,4 +16,5 @@ SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 ARSampling = {path = ".."}
 
 [compat]
+Chairmarks = "1.3.1"
 Documenter = "1"
