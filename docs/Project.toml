@@ -1,0 +1,18 @@
+[deps]
+ARSampling = "734118fd-b2ca-5927-97ab-9c05d4b14812"
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+Chairmarks = "0ca39b1e-fe0b-4e98-acfc-b1656634c4de"
+DifferentiationInterface = "a0c0ee7d-e4b9-4e03-894e-1c5f64a51d63"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+DocumenterCitations = "daee34ce-89f3-4625-b898-19384cb65244"
+ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+LiveServer = "16fef848-5104-11e9-1b77-fb7a48bbb589"
+Mooncake = "da2b9cff-9c12-43a0-ae48-6db2b0edb7d6"
+SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
+
+[sources]
+ARSampling = {path = ".."}
+
+[compat]
+Documenter = "1"

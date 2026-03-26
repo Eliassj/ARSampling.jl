@@ -1,0 +1,40 @@
+# Changes here will be overwritten by Copier
+AddAllcontributors: false
+AddCitationCFF: true
+AddCodeOfConduct: false
+AddContributionDocs: true
+AddCopierCI: false
+AddDocs: true
+AddDocsCI: true
+AddFormatterAndLinterConfigFiles: true
+AddGitHubPRTemplate: true
+AddGitHubTemplates: true
+AddLintCI: true
+AddLychee: false
+AddMacToCI: true
+AddPrecommit: true
+AddPrecommitUpdateCI: false
+AddTagBotCI: true
+AddTestCI: true
+AddWinToCI: true
+Authors: Elias Sjölin <elias.sjolin@gmail.com>
+CheckExplicitImports: false
+ConfigIndentation: 2
+GitHubActionVersionAutoUpdate: dependabot
+JuliaCompatAutoUpdate: dependabot
+JuliaIndentation: 4
+JuliaMinCIVersion: lts
+JuliaMinVersion: '1.10'
+License: MIT
+LicenseCopyrightHolders: Elias Sjölin
+MarkdownIndentation: 2
+PackageName: ARSampling
+PackageOwner: Eliassj
+PackageUUID: 734118fd-b2ca-5927-97ab-9c05d4b14812
+RunJuliaNightlyOnCI: false
+StrategyConfirmIncluded: true
+StrategyLevel: 3
+StrategyReviewExcluded: false
+TestingStrategy: basic
+UseCirrusCI: false
+_src_path: /home/eliass/.julia/packages/BestieTemplate/fOzc4
