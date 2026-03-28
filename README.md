@@ -17,8 +17,7 @@ set_theme!(theme_latexfonts())
 update_theme!(linewidth = 6)
 Random.seed!(1)
 
-k, n = 3, 25
-
+# Unnormalized density to sample from
 function log_alpha(x, k, n)
            alpha = exp(x)
            x +
@@ -28,11 +27,15 @@ function log_alpha(x, k, n)
            loggamma(n + alpha)
 end
 
+# Define objective function
+k, n = 3, 25
 obj = Objective(x -> log_alpha(x, k, n))
 
+# Create sampler and sample
 sam = ARSampler(obj, (-Inf, Inf))
 samples = sample!(sam, 10000)
 
+# Plot results
 fig, ax, hst = hist(
     samples, 
     bins=100, 
@@ -43,7 +46,6 @@ ax2 = Axis(fig[1,1], yaxisposition = :right, ytickformat = "{:.1e}")
 hidespines!(ax2)
 hidexdecorations!(ax2)
 linkxaxes!(ax, ax2)
-
 lins = lines!(
     ax2, 
     -3..3,
