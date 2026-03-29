@@ -50,7 +50,7 @@ end
 Objective function including its gradient
 =#
 
-struct Objective{F <: Function, G <: Function}
+struct Objective{F <: Function, G <: Function, T <: Number}
     "The (log-concave) function defining the density `f(x) -> y`"
     f::F
     "Its gradient `grad(x) -> y'`"
@@ -60,14 +60,16 @@ struct Objective{F <: Function, G <: Function}
     $(TYPEDSIGNATURES)
 
     Create an `Objective` directly defined by its function `f` and custom gradient `grad`.
+    The parameter `T` represents the type of the expected input and is utilized when preparing gradients using autodiff.
+    By default `T = Float64`.
 
 
     !!! warning
         Observe that `f` should be in its
         log-concave form and that no checks are performed in order to verify this.
     """
-    function Objective(f::Function, grad::Function)
-        return new{typeof(f), typeof(grad)}(f, grad)
+    function Objective(f::Function, grad::Function, ::Type{T} = Float64) where {T <: Number}
+        return new{typeof(f), typeof(grad), T}(f, grad)
     end
 end
 
@@ -99,7 +101,8 @@ function Objective(f::Function, init = one(Float64); adbackend = AutoForwardDiff
     gradprep = prepare_gradient(f, adbackend, init)
     obj = Objective(
         f,
-        x -> gradient(f, gradprep, adbackend, x)
+        x -> gradient(f, gradprep, adbackend, x),
+        typeof(init)
     )
     return obj
 end
@@ -313,7 +316,7 @@ function eval_hull(h::LowerHull, x)
 end
 
 struct ARSampler{T, F, G}
-    objective::Objective{F, G}
+    objective::Objective{F, G, T}
     upper_hull::UpperHull{T}
     lower_hull::LowerHull{T}
 end
@@ -350,7 +353,7 @@ $(METHODLIST)
 function ARSampler end
 
 function ARSampler(
-        obj::Objective{F, G},
+        obj::Objective{F, G, T},
         domain::Tuple{T, T},
         initial_points::Vector{T}
     ) where {T <: AbstractFloat, F <: Function, G <: Function}
@@ -362,12 +365,15 @@ function ARSampler(
 end
 
 
-function ARSampler(obj::Objective{F, G}, domain::Tuple{T, T}, search_range::Tuple{T, T} = (-10.0, 10.0); search_step = 0.5) where {T <: AbstractFloat, F <: Function, G <: Function}
-    lbs = max(domain[1], search_range[1])
-    ubs = min(domain[2], search_range[2])
-    initial_points = find_initial_points(obj, lbs, ubs, search_step)
+function ARSampler(obj::Objective{F, G, T}, domain::Tuple{<:Number, <:Number}, search_range::Tuple{<:Number, <:Number} = (-10.0, 10.0); search_step = 0.5) where {T <: AbstractFloat, F <: Function, G <: Function}
+    domain_T = T.(domain)
+    search_range_T = T.(search_range)
+    lbs = T(max(domain_T[1], search_range_T[1]))
+    ubs = T(min(domain_T[2], search_range_T[2]))
+    search_step_T = T(search_step)
+    initial_points = find_initial_points(obj, lbs, ubs, search_step_T)
 
-    return ARSampler(obj, domain, initial_points)
+    return ARSampler(obj, domain_T, initial_points)
 end
 
 function find_initial_points(obj, lbs, ubs, search_step)
@@ -376,20 +382,24 @@ function find_initial_points(obj, lbs, ubs, search_step)
     g = (grad(x) for x in r)
     l = findfirst(>(0), g)
     u = findfirst(<(0), g)
-    isnothing(l) && throw(ErrorException(
-        lazy"""
-        Could not find left initial segment.
-        Search range: $(lbs) -- $(ubs)
-        Search step: $(search_step)
-        """
-    ))
-    isnothing(u) && throw(ErrorException(
-        lazy"""
-        Could not find right initial segment.
-        Search range: $(lbs) -- $(ubs)
-        Search step: $(search_step)
-        """
-    ))
+    isnothing(l) && throw(
+        ErrorException(
+            lazy"""
+            Could not find left initial segment.
+            Search range: $(lbs) -- $(ubs)
+            Search step: $(search_step)
+            """
+        )
+    )
+    isnothing(u) && throw(
+        ErrorException(
+            lazy"""
+            Could not find right initial segment.
+            Search range: $(lbs) -- $(ubs)
+            Search step: $(search_step)
+            """
+        )
+    )
     return [r[l], r[u]]
 end
 
