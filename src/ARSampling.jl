@@ -160,6 +160,7 @@ function calc_intersects!(out::AbstractVector{T}, slopes::AbstractVector{T}, int
     return nothing
 end
 
+
 function calc_slopes_and_intercepts(obj::Objective, abscissae::AbstractVector{T}) where {T}
     issorted(abscissae) ||
         throw(ArgumentError("`abscissae` should be sorted in ascending order."))

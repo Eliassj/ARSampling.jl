@@ -58,7 +58,7 @@ Legend(fig[2, 1], [hst, lins], ["Sampled density", "Unnormalized density"],
 fig
 ```
 
-<img src="https://raw.githubusercontent.com/Eliassj/ARSampling.jl/2de9b95f79d3132eb1fc6fdc1c2cd603f47c18dc/assets/example.svg" width=100%>
+<img src="https://raw.githubusercontent.com/Eliassj/ARSampling.jl/2de9b95f79d3132eb1fc6fdc1c2cd603f47c18dc/assets/example.svg" alt="Sampling results compared to unnormalized distribution" width=100%>
 
 ## How to Cite
 
